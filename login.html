@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Commerce Intelligence — Connexion</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0a0f; --surface: #111118; --border: #1e1e2e;
+      --accent: #00ff88; --accent2: #0066ff; --warn: #ff6b35;
+      --text: #e8e8f0; --muted: #6b6b85; --card-bg: #13131c;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    /* Glow orbs */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      opacity: 0.12;
+    }
+    .orb-1 { width: 400px; height: 400px; background: var(--accent); top: -100px; left: -100px; }
+    .orb-2 { width: 300px; height: 300px; background: var(--accent2); bottom: -80px; right: -80px; }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 420px;
+      padding: 20px;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Logo */
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 36px;
+    }
+    .logo-dot {
+      width: 8px; height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 12px var(--accent);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
+
+    /* Card */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-bottom: 1px solid var(--border);
+    }
+    .tab {
+      padding: 14px;
+      text-align: center;
+      font-size: .72rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      color: var(--muted);
+      transition: all .2s;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+    }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab:hover:not(.active) { color: var(--text); }
+
+    /* Form */
+    .form { padding: 32px; display: none; flex-direction: column; gap: 16px; }
+    .form.active { display: flex; }
+
+    .field { display: flex; flex-direction: column; gap: 7px; }
+    .field label { font-size: .65rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+
+    .field input {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 11px 14px;
+      font-family: 'DM Mono', monospace;
+      font-size: .82rem;
+      border-radius: 3px;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .field input:focus { border-color: var(--accent); }
+    .field input::placeholder { color: var(--muted); }
+
+    .submit-btn {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      padding: 13px;
+      font-family: 'Syne', sans-serif;
+      font-size: .85rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: all .2s;
+      margin-top: 4px;
+    }
+    .submit-btn:hover { background: #00e67a; transform: translateY(-1px); }
+    .submit-btn:active { transform: translateY(0); }
+    .submit-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+    .error-msg {
+      font-size: .72rem;
+      color: var(--warn);
+      padding: 10px 12px;
+      border: 1px solid rgba(255,107,53,.3);
+      border-radius: 3px;
+      background: rgba(255,107,53,.05);
+      display: none;
+    }
+    .error-msg.show { display: block; }
+
+    .success-msg {
+      font-size: .72rem;
+      color: var(--accent);
+      padding: 10px 12px;
+      border: 1px solid rgba(0,255,136,.3);
+      border-radius: 3px;
+      background: rgba(0,255,136,.05);
+      display: none;
+    }
+    .success-msg.show { display: block; }
+
+    /* Plan info */
+    .plan-info {
+      margin: 0 32px 24px;
+      padding: 14px;
+      background: rgba(0,102,255,.06);
+      border: 1px solid rgba(0,102,255,.2);
+      border-radius: 3px;
+      font-size: .72rem;
+      color: var(--muted);
+      line-height: 1.6;
+      display: none;
+    }
+    .plan-info.show { display: block; }
+    .plan-info strong { color: var(--text); }
+
+    /* Spinner */
+    .spinner {
+      display: inline-block;
+      width: 12px; height: 12px;
+      border: 2px solid rgba(0,0,0,.3);
+      border-top-color: #000;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      margin-top: 24px;
+      font-size: .68rem;
+      color: var(--muted);
+    }
+    .footer a { color: var(--accent); text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+
+    /* Pro upgrade banner */
+    .upgrade-banner {
+      margin: 0 32px 24px;
+      padding: 16px;
+      background: linear-gradient(135deg, rgba(0,255,136,.08), rgba(0,102,255,.08));
+      border: 1px solid rgba(0,255,136,.2);
+      border-radius: 3px;
+      display: none;
+    }
+    .upgrade-banner.show { display: block; }
+    .upgrade-title {
+      font-family: 'Syne', sans-serif;
+      font-size: .85rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .upgrade-desc {
+      font-size: .7rem;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+    .upgrade-btn {
+      background: none;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 8px 16px;
+      font-family: 'DM Mono', monospace;
+      font-size: .72rem;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: all .2s;
+      letter-spacing: .05em;
+      width: 100%;
+    }
+    .upgrade-btn:hover { background: rgba(0,255,136,.1); }
+
+    /* Bannière renvoi email */
+    .resend-banner {
+      margin: 0 32px 20px;
+      padding: 16px;
+      background: rgba(255,107,53,.05);
+      border: 1px solid rgba(255,107,53,.25);
+      border-radius: 3px;
+      display: none;
+    }
+    .resend-banner.show { display: block; }
+    .resend-title { font-size:.78rem; color:var(--warn); margin-bottom:8px; }
+    .resend-desc  { font-size:.7rem; color:var(--muted); line-height:1.6; margin-bottom:12px; }
+    .resend-btn {
+      background: none; border: 1px solid var(--warn); color: var(--warn);
+      padding: 8px 14px; font-family: 'DM Mono', monospace; font-size:.72rem;
+      cursor: pointer; border-radius: 2px; transition: all .2s; width:100%;
+      letter-spacing:.04em;
+    }
+    .resend-btn:hover { background: rgba(255,107,53,.1); }
+
+    /* Bannière succès confirmation */
+    .confirm-banner {
+      margin: 0 32px 20px;
+      padding: 16px;
+      background: rgba(0,255,136,.05);
+      border: 1px solid rgba(0,255,136,.25);
+      border-radius: 3px;
+      display: none;
+    }
+    .confirm-banner.show { display: block; }
+    .confirm-title { font-size:.78rem; color: var(--accent); margin-bottom:6px; }
+    .confirm-desc  { font-size:.7rem; color: var(--muted); line-height:1.6; }
+  </style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<div class="container">
+  <div class="logo">
+    <div class="logo-dot"></div>
+    AI COMMERCE INTELLIGENCE
+  </div>
+
+  <div class="card">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('login')">Connexion</div>
+      <div class="tab" onclick="switchTab('register')">Inscription</div>
+    </div>
+
+    <!-- Bannière email non confirmé -->
+    <div class="resend-banner" id="resendBanner">
+      <div class="resend-title">⚠️ Email non confirmé</div>
+      <div class="resend-desc" id="resendDesc">Vérifie ta boîte mail et clique sur le lien de confirmation.</div>
+      <button class="resend-btn" onclick="resendConfirmation()">↻ Renvoyer l'email de confirmation</button>
+    </div>
+
+    <!-- Bannière confirmation réussie -->
+    <div class="confirm-banner" id="confirmBanner">
+      <div class="confirm-title">✓ Email confirmé avec succès !</div>
+      <div class="confirm-desc">Ton compte est activé. Tu peux maintenant te connecter.</div>
+    </div>
+
+    <!-- LOGIN -->
+    <form class="form active" id="loginForm" onsubmit="handleLogin(event)">
+      <div class="error-msg"   id="loginError"></div>
+      <div class="success-msg" id="loginSuccess"></div>
+
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="loginEmail" placeholder="ton@email.com" required/>
+      </div>
+      <div class="field">
+        <label>Mot de passe</label>
+        <input type="password" id="loginPassword" placeholder="••••••••" required/>
+      </div>
+      <button class="submit-btn" type="submit" id="loginBtn">Se connecter</button>
+    </form>
+
+    <!-- Upgrade banner (visible après login si plan free) -->
+    <div class="upgrade-banner" id="upgradeBanner">
+      <div class="upgrade-title">🚀 Passez au plan Pro</div>
+      <div class="upgrade-desc">
+        Débloquez les scores d'opportunité, la comparaison multi-plateforme
+        et l'export CSV pour <strong>11 500 FCFA/mois</strong>.
+      </div>
+      <button class="upgrade-btn" onclick="handleUpgrade()">Passer Pro →</button>
+    </div>
+
+    <!-- REGISTER -->
+    <form class="form" id="registerForm" onsubmit="handleRegister(event)">
+      <div class="error-msg"   id="registerError"></div>
+      <div class="success-msg" id="registerSuccess"></div>
+
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="regEmail" placeholder="ton@email.com" required/>
+      </div>
+      <div class="field">
+        <label>Mot de passe</label>
+        <input type="password" id="regPassword" placeholder="6 caractères minimum" required/>
+      </div>
+      <div class="field">
+        <label>Confirmer le mot de passe</label>
+        <input type="password" id="regConfirm" placeholder="••••••••" required/>
+      </div>
+      <button class="submit-btn" type="submit" id="registerBtn">Créer mon compte</button>
+    </form>
+
+    <!-- Plan info -->
+    <div class="plan-info show" id="planInfo">
+      <strong>Plan Gratuit</strong> — 10 produits tendances sans scores.<br>
+      <strong>Plan Pro (11 500 FCFA/mois)</strong> — Scores, comparaison, export CSV, accès illimité.
+    </div>
+  </div>
+
+  <div class="footer">
+    En continuant, vous acceptez nos
+    <a href="#">conditions d'utilisation</a>.<br>
+    <span style="margin-top:6px;display:block">
+      Déjà connecté ? <a href="dashboard.html">Accéder au dashboard →</a>
+    </span>
+  </div>
+</div>
+
+<script>
+  const AUTH_API = 'http://localhost:5001';
+
+  // ── Tabs ──────────────────────────────────────────────────────
+  function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach((t, i) =>
+      t.classList.toggle('active', ['login','register'][i] === tab)
+    );
+    document.getElementById('loginForm').classList.toggle('active', tab === 'login');
+    document.getElementById('registerForm').classList.toggle('active', tab === 'register');
+    document.getElementById('upgradeBanner').classList.remove('show');
+    document.getElementById('planInfo').classList.toggle('show', tab === 'register');
+  }
+
+  // ── Helpers ───────────────────────────────────────────────────
+  function showError(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 5000);
+  }
+
+  function showSuccess(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.classList.add('show');
+  }
+
+  function setLoading(btnId, loading) {
+    const btn = document.getElementById(btnId);
+    btn.disabled = loading;
+    btn.innerHTML = loading
+      ? '<span class="spinner"></span>Chargement…'
+      : (btnId === 'loginBtn' ? 'Se connecter' : 'Créer mon compte');
+  }
+
+  // ── Login ─────────────────────────────────────────────────────
+  async function handleLogin(e) {
+    e.preventDefault();
+    setLoading('loginBtn', true);
+
+    const email    = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+
+    try {
+      const r = await fetch(`${AUTH_API}/auth/login`, {
+        method:  'POST',
+        headers: {'Content-Type': 'application/json'},
+        body:    JSON.stringify({email, password}),
+      });
+      const d = await r.json();
+
+      if (!d.success) {
+        showError('loginError', d.error);
+        // Afficher le bouton de renvoi si email non confirmé
+        if (d.unverified) {
+          const banner = document.getElementById('resendBanner');
+          document.getElementById('resendDesc').textContent =
+            'Un email de confirmation a été envoyé à ' + d.email + '. Vérifie ta boîte mail (et les spams).';
+          banner.classList.add('show');
+          // Stocker l'email pour le renvoi
+          document.getElementById('loginEmail').setAttribute('data-unverified', d.email);
+        }
+        return;
+      }
+
+      // Sauvegarder le token et les infos user
+      localStorage.setItem('aci_token', d.token);
+      localStorage.setItem('aci_user',  JSON.stringify(d.user));
+
+      if (d.user.plan === 'free') {
+        showSuccess('loginSuccess', '✓ Connecté ! Plan gratuit actif.');
+        document.getElementById('upgradeBanner').classList.add('show');
+        // Redirection après 2s
+        setTimeout(() => window.location.href = 'dashboard.html', 2000);
+      } else {
+        showSuccess('loginSuccess', '✓ Connecté ! Plan Pro actif. Redirection…');
+        setTimeout(() => window.location.href = 'dashboard.html', 1500);
+      }
+
+    } catch(err) {
+      showError('loginError', 'Impossible de joindre le serveur. Lance python auth.py');
+    } finally {
+      setLoading('loginBtn', false);
+    }
+  }
+
+  // ── Register ──────────────────────────────────────────────────
+  async function handleRegister(e) {
+    e.preventDefault();
+    const email    = document.getElementById('regEmail').value;
+    const password = document.getElementById('regPassword').value;
+    const confirm  = document.getElementById('regConfirm').value;
+
+    if (password !== confirm) {
+      showError('registerError', 'Les mots de passe ne correspondent pas.');
+      return;
+    }
+    if (password.length < 6) {
+      showError('registerError', 'Mot de passe trop court (6 caractères min).');
+      return;
+    }
+
+    setLoading('registerBtn', true);
+
+    try {
+      const r = await fetch(`${AUTH_API}/auth/register`, {
+        method:  'POST',
+        headers: {'Content-Type': 'application/json'},
+        body:    JSON.stringify({email, password}),
+      });
+      const d = await r.json();
+
+      if (!d.success) {
+        showError('registerError', d.error);
+        return;
+      }
+
+      // Pas de token — compte en attente de confirmation
+      showSuccess('registerSuccess',
+        '✓ Compte créé ! Un email de confirmation a été envoyé à ' + email + '. Clique sur le lien pour activer ton compte.'
+      );
+      // Basculer vers l'onglet connexion après 3s
+      setTimeout(() => switchTab('login'), 3000);
+
+    } catch(err) {
+      showError('registerError', 'Impossible de joindre le serveur.');
+    } finally {
+      setLoading('registerBtn', false);
+    }
+  }
+
+  // ── Renvoi email de confirmation ─────────────────────────────
+  let unverifiedEmail = '';
+
+  async function resendConfirmation() {
+    const email = document.getElementById('loginEmail').value.trim()
+      || document.getElementById('loginEmail').getAttribute('data-unverified')
+      || unverifiedEmail;
+
+    if (!email) {
+      alert('Entre ton adresse email dans le champ ci-dessus.');
+      return;
+    }
+
+    const btn = document.querySelector('.resend-btn');
+    btn.disabled = true;
+    btn.textContent = '⏳ Envoi en cours…';
+
+    try {
+      const r = await fetch(`${AUTH_API}/auth/resend-confirmation`, {
+        method:  'POST',
+        headers: {'Content-Type': 'application/json'},
+        body:    JSON.stringify({ email }),
+      });
+      const d = await r.json();
+      if (d.success) {
+        btn.textContent = '✓ Email envoyé ! Vérifie ta boîte mail.';
+        btn.style.borderColor = 'var(--accent)';
+        btn.style.color = 'var(--accent)';
+      } else {
+        btn.textContent = '❌ ' + (d.error || 'Erreur');
+        btn.disabled = false;
+      }
+    } catch(e) {
+      btn.textContent = '❌ Serveur inaccessible';
+      btn.disabled = false;
+    }
+  }
+
+  // ── Vérifier si on arrive depuis un lien de confirmation ──────
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('confirmed') === '1') {
+    document.getElementById('confirmBanner').classList.add('show');
+  }
+
+  // ── Upgrade vers Pro ──────────────────────────────────────────
+  async function handleUpgrade() {
+    const token = localStorage.getItem('aci_token');
+    if (!token) { window.location.href = 'login.html'; return; }
+
+    try {
+      const r = await fetch(`${AUTH_API}/auth/create-checkout`, {
+        method:  'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      const d = await r.json();
+
+      if (d.success && d.checkout_url) {
+        window.open(d.checkout_url, '_blank');
+      } else {
+        alert('Erreur : ' + (d.error || 'Impossible de créer le checkout.'));
+      }
+    } catch(err) {
+      alert('Serveur inaccessible.');
+    }
+  }
+
+  // ── Auto-redirect si déjà connecté (désactivé pour permettre déconnexion) ──
+  // Décommente si tu veux rediriger automatiquement les utilisateurs connectés
+  // const existingToken = localStorage.getItem('aci_token');
+  // if (existingToken) window.location.href = 'dashboard.html';
+</script>
+</body>
+</html>

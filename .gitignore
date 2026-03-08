@@ -1,0 +1,31 @@
+# Environnement Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Variables d'environnement — NE JAMAIS committer
+.env
+*.env
+
+# Logs
+*.log
+scheduler.log
+
+# Base de données locale
+*.db
+*.sqlite
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Playwright
+playwright/.local-browsers/
