@@ -20,10 +20,7 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 #  CONFIG
 # ══════════════════════════════════════════════════════════════════
 
-MYSQL_USER     = "root"
-MYSQL_PASSWORD = "Attraction24"
-MYSQL_HOST     = "127.0.0.1"
-MYSQL_DB       = "ai_commerce"
+from config import get_db_url
 
 # Zones géographiques — codes Google Trends RSS
 GEO_ZONES = [
@@ -62,11 +59,11 @@ class Trend(Base):
     scraped_at  = Column(DateTime,    default=datetime.datetime.utcnow)
 
 engine  = create_engine(
-    f"mysql+mysqlconnector://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}/{MYSQL_DB}",
+    get_db_url(),
     echo=False
 )
 Session = sessionmaker(bind=engine)
-Base.metadata.create_all(engine)
+Base.metadata.create_all(engine, checkfirst=True)
 
 
 # ══════════════════════════════════════════════════════════════════

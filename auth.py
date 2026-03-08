@@ -77,7 +77,7 @@ engine_users = create_engine(
     echo=False
 )
 SessionUsers = sessionmaker(bind=engine_users)
-Base.metadata.create_all(engine_users)
+Base.metadata.create_all(engine_users, checkfirst=True)
 
 # ══════════════════════════════════════════════════════════════════
 #  APP

@@ -37,4 +37,4 @@ engine = create_engine(
     echo=False
 )
 Session = sessionmaker(bind=engine)
-Base.metadata.create_all(engine)
+Base.metadata.create_all(engine, checkfirst=True)
