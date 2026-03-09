@@ -29,6 +29,7 @@ from config import (
     JWT_SECRET
 )
 
+# IMPORTANT : correspond à ton database.py
 from database import Product, Session as SessionLocal
 
 from trends_scraper import (
@@ -40,9 +41,13 @@ from trends_scraper import (
 # APP
 # ─────────────────────────────────────────
 
-app = Flask(__name__, static_folder='.', static_url_path='')
-CORS(app)
+app = Flask(
+    __name__,
+    static_folder=".",
+    static_url_path=""
+)
 
+CORS(app)
 bcrypt = Bcrypt(app)
 
 # ─────────────────────────────────────────
@@ -163,16 +168,32 @@ def require_pro(f):
 
 
 # ─────────────────────────────────────────
-# ROUTES
+# STATIC PAGES
 # ─────────────────────────────────────────
 
 @app.route("/")
 def home():
-    return app.send_static_file('login.html')
+    return app.send_static_file("login.html")
+
+
+@app.route("/login")
+def login_page():
+    return app.send_static_file("login.html")
+
+
+@app.route("/register")
+def register_page():
+    return app.send_static_file("register.html")
+
 
 @app.route("/dashboard")
 def dashboard():
-    return app.send_static_file('dashboard.html')
+    return app.send_static_file("dashboard.html")
+
+
+# ─────────────────────────────────────────
+# HEALTH CHECK
+# ─────────────────────────────────────────
 
 @app.route("/health")
 def health_check():
@@ -180,7 +201,7 @@ def health_check():
 
 
 # ─────────────────────────────────────────
-# AUTH
+# AUTH API
 # ─────────────────────────────────────────
 
 @app.route("/auth/register", methods=["POST"])
@@ -364,13 +385,6 @@ def trends():
 @app.route("/api/trends/stats")
 def trends_stats():
     return jsonify(get_trends_stats())
-
-
-# ─────────────────────────────────────────
-# HEALTH CHECK (Railway)
-# ─────────────────────────────────────────
-
-
 
 
 # ─────────────────────────────────────────
