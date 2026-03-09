@@ -24,8 +24,16 @@ from flask_cors import CORS
 from sqlalchemy import func, desc
 from database import Session, Product
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app)
+
+@app.route('/')
+def index():
+    return app.send_static_file('login.html')
+
+@app.route('/dashboard')
+def dashboard():
+    return app.send_static_file('dashboard.html')
 
 
 # ══════════════════════════════════════════════════════════════════
@@ -305,4 +313,6 @@ if __name__ == "__main__":
     print("  AI Commerce Intelligence — API")
     print("  http://localhost:5000")
     print("═" * 45)
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    import os
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", debug=False, port=port)
