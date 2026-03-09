@@ -23,6 +23,31 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from sqlalchemy import func, desc
 from database import Session, Product
+from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime
+from sqlalchemy.orm import declarative_base
+from config import get_db_url
+import datetime
+
+# Créer toutes les tables au démarrage (products + users + trends)
+_Base = declarative_base()
+
+class _User(_Base):
+    __tablename__ = "users"
+    id            = Column(Integer, primary_key=True, autoincrement=True)
+    email         = Column(String(255), unique=True, nullable=False)
+    password_hash = Column(String(255), nullable=False)
+    plan          = Column(String(20), default="free")
+    ls_customer_id= Column(String(100), default="")
+    ls_sub_id     = Column(String(100), default="")
+    pro_until     = Column(DateTime, nullable=True)
+    created_at    = Column(DateTime, default=datetime.datetime.utcnow)
+    is_active     = Column(Boolean, default=True)
+    is_verified   = Column(Boolean, default=False)
+    verify_token  = Column(String(100), default="")
+    verify_expiry = Column(DateTime, nullable=True)
+
+_engine = create_engine(get_db_url(), echo=False)
+_Base.metadata.create_all(_engine, checkfirst=True)
 
 app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app)
