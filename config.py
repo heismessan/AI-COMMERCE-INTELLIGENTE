@@ -51,9 +51,9 @@ SENDER_NAME   = "AI Commerce Intelligence"
 
 # ── URLs ──────────────────────────────────────────────────────────
 # En prod Railway : https://ton-app.up.railway.app
-APP_URL      = os.environ.get("APP_URL",      "http://localhost:5001")
-API_URL      = os.environ.get("API_URL",      "http://localhost:5000")
-FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:5000")
+APP_URL      = os.environ.get("APP_URL",      "https://ai-commerce-intelligente-production.up.railway.app")
+API_URL      = os.environ.get("API_URL",      "https://ai-commerce-intelligente-production.up.railway.app")
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "https://ai-commerce-intelligente-production.up.railway.app")
 
 # ── Ports ─────────────────────────────────────────────────────────
 PORT      = int(os.environ.get("PORT",      5000))

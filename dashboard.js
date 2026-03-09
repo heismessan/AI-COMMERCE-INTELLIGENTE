@@ -3,8 +3,8 @@
 //  Logique principale du dashboard
 // ═══════════════════════════════════════════════════════════════
 
-const API      = 'http://localhost:5000';
-const AUTH_API = 'http://localhost:5001';
+const API      = 'https://ai-commerce-intelligente-production.up.railway.app';
+const AUTH_API = 'https://ai-commerce-intelligente-production.up.railway.app';
 
 let activePlatform = '';
 let searchTimer    = null;
