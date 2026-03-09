@@ -29,7 +29,7 @@ from config import (
     JWT_SECRET
 )
 
-from database import Product, SessionLocal
+from database import Product, Session as SessionLocal
 
 from trends_scraper import (
     get_top_trends,
@@ -40,7 +40,7 @@ from trends_scraper import (
 # APP
 # ─────────────────────────────────────────
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app)
 
 bcrypt = Bcrypt(app)
@@ -80,7 +80,7 @@ class User(Base):
     is_active = Column(Boolean, default=True)
 
 
-Base.metadata.create_all(engine_users)
+Base.metadata.create_all(engine_users, checkfirst=True)
 
 # ─────────────────────────────────────────
 # AUTH HELPERS
@@ -168,6 +168,14 @@ def require_pro(f):
 
 @app.route("/")
 def home():
+    return app.send_static_file('login.html')
+
+@app.route("/dashboard")
+def dashboard():
+    return app.send_static_file('dashboard.html')
+
+@app.route("/health")
+def health_check():
     return jsonify({"status": "AI Commerce Intelligence API running"})
 
 
@@ -362,9 +370,7 @@ def trends_stats():
 # HEALTH CHECK (Railway)
 # ─────────────────────────────────────────
 
-@app.route("/health")
-def health():
-    return jsonify({"status": "ok"})
+
 
 
 # ─────────────────────────────────────────
