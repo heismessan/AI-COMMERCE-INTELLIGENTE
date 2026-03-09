@@ -253,20 +253,7 @@ def get_platforms():
         session.close()
 
 
-@app.route("/", methods=["GET"])
-def index():
-    return jsonify({
-        "name":    "AI Commerce Intelligence API",
-        "version": "1.0",
-        "endpoints": {
-            "GET /api/products":           "Tous les produits (pagination, filtres)",
-            "GET /api/products/top":       "Top produits par score",
-            "GET /api/products/search?q=": "Recherche par titre",
-            "GET /api/products/<id>":      "Produit par ID",
-            "GET /api/stats":              "Statistiques globales",
-            "GET /api/platforms":          "Plateformes disponibles",
-        }
-    })
+
 
 
 # ══════════════════════════════════════════════════════════════════
