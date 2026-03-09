@@ -87,6 +87,20 @@ def get_current_user():
     finally:
         session.close()
 
+def require_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth = request.headers.get("Authorization", "")
+        if not auth.startswith("Bearer "):
+            return jsonify({"success": False, "error": "Token manquant."}), 401
+        payload = decode_token(auth.split(" ")[1])
+        if not payload:
+            return jsonify({"success": False, "error": "Token invalide ou expiré."}), 401
+        g.user_id = payload["user_id"]
+        g.plan    = payload["plan"]
+        return f(*args, **kwargs)
+    return decorated
+
 # ── Pages statiques ───────────────────────────────────────────────
 @app.route('/')
 def index():
