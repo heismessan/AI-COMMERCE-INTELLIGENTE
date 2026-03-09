@@ -31,7 +31,7 @@ from email_service import (
     generate_verification_token, token_expiry
 )
 from trends_scraper import get_top_trends, get_trends_stats
-
+from functools import wraps
 # ── App ───────────────────────────────────────────────────────────
 app    = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app)
