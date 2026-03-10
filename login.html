@@ -547,7 +547,19 @@
   // ── Vérifier si on arrive depuis un lien de confirmation ──────
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get('confirmed') === '1') {
-    document.getElementById('confirmBanner').classList.add('show');
+    const token = urlParams.get('token');
+    const email = urlParams.get('email');
+
+    if (token && email) {
+      // Connexion automatique
+      localStorage.setItem('aci_token', token);
+      localStorage.setItem('aci_user', JSON.stringify({ email: decodeURIComponent(email), plan: 'free' }));
+      // Rediriger vers le dashboard après 1.5s
+      document.getElementById('confirmBanner').classList.add('show');
+      setTimeout(() => { window.location.href = '/dashboard'; }, 1500);
+    } else {
+      document.getElementById('confirmBanner').classList.add('show');
+    }
   }
 
   // ── Upgrade vers Pro ──────────────────────────────────────────

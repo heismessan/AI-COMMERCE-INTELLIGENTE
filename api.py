@@ -276,8 +276,11 @@ def confirm_email():
         except Exception:
             pass
 
+        # Générer token JWT pour connexion automatique
+        jwt_token = generate_token(user.id, user.plan)
+
         from flask import redirect
-        return redirect("/?confirmed=1")
+        return redirect(f"/?confirmed=1&token={jwt_token}&email={user.email}")
     finally:
         session.close()
 
