@@ -11,6 +11,7 @@ Configuration :
     Remplis BREVO_API_KEY et SENDER_EMAIL ci-dessous
 """
 
+import os
 import requests
 import secrets
 import datetime
@@ -19,12 +20,9 @@ import datetime
 #  CONFIGURATION — remplis ces deux valeurs
 # ══════════════════════════════════════════════════════════════════
 
-BREVO_API_KEY = "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"   # xkeysib-...
-SENDER_EMAIL  = "smessan35@gmail.com"        # email vérifié dans Brevo
-SENDER_NAME   = "AI Commerce Intelligence"
+from config import BREVO_API_KEY, SENDER_EMAIL, SENDER_NAME, APP_URL
 
 APP_NAME = "AI Commerce Intelligence"
-APP_URL  = "http://localhost:5001"
 
 BREVO_URL = "https://api.brevo.com/v3/smtp/email"
 
