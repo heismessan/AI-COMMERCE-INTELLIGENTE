@@ -30,7 +30,7 @@ from config import (
 )
 
 # IMPORTANT : correspond à ton database.py
-from database import Product, Session as SessionLocal
+from database import Product, SessionLocal
 
 from trends_scraper import (
     get_top_trends,

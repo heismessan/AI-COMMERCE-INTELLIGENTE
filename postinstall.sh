@@ -1,1 +1,2 @@
-playwright install chromium
+#!/bin/bash
+echo "Build complete"
