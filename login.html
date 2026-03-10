@@ -426,8 +426,8 @@
       });
       const d = await r.json();
 
-      if (!d.success) {
-        showError('loginError', d.error);
+      if (!d.token) {
+        showError('loginError', d.error || 'Connexion impossible');
         // Afficher le bouton de renvoi si email non confirmé
         if (d.unverified) {
           const banner = document.getElementById('resendBanner');
@@ -448,10 +448,10 @@
         showSuccess('loginSuccess', '✓ Connecté ! Plan gratuit actif.');
         document.getElementById('upgradeBanner').classList.add('show');
         // Redirection après 2s
-        setTimeout(() => window.location.href = 'dashboard.html', 2000);
+        setTimeout(() => window.location.href = '/dashboard', 2000);
       } else {
         showSuccess('loginSuccess', '✓ Connecté ! Plan Pro actif. Redirection…');
-        setTimeout(() => window.location.href = 'dashboard.html', 1500);
+        setTimeout(() => window.location.href = '/dashboard', 1500);
       }
 
     } catch(err) {
@@ -587,7 +587,7 @@
   // ── Auto-redirect si déjà connecté (désactivé pour permettre déconnexion) ──
   // Décommente si tu veux rediriger automatiquement les utilisateurs connectés
   // const existingToken = localStorage.getItem('aci_token');
-  // if (existingToken) window.location.href = 'dashboard.html';
+  // if (existingToken) window.location.href = '/dashboard';
 </script>
 </body>
 </html>
