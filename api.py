@@ -32,6 +32,7 @@ from config import (
 # IMPORTANT : correspond à ton database.py
 from database import Product, SessionLocal
 
+from email_service import send_confirmation_email, send_welcome_email, generate_verification_token, token_expiry
 from trends_scraper import (
     get_top_trends,
     get_trends_stats
@@ -82,7 +83,10 @@ class User(Base):
 
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
-    is_active = Column(Boolean, default=True)
+    is_active     = Column(Boolean,     default=True)
+    is_verified   = Column(Boolean,     default=False)
+    verify_token  = Column(String(100), default="")
+    verify_expiry = Column(DateTime,    nullable=True)
 
 
 Base.metadata.create_all(engine_users, checkfirst=True)
@@ -231,9 +235,49 @@ def register():
 
         session.add(user)
         session.commit()
+        session.refresh(user)
 
-        return jsonify({"success": True})
+        # Envoyer email de confirmation
+        try:
+            token = generate_verification_token()
+            user.verify_token  = token
+            user.verify_expiry = token_expiry()
+            session.commit()
+            send_confirmation_email(email, token)
+        except Exception as e:
+            print(f"⚠️ Email non envoyé : {e}")
 
+        return jsonify({"success": True, "message": "Vérifie ta boîte mail pour confirmer ton compte."})
+
+    finally:
+        session.close()
+
+
+@app.route("/auth/confirm-email", methods=["GET"])
+def confirm_email():
+    token = request.args.get("token", "")
+    if not token:
+        return jsonify({"error": "Token manquant"}), 400
+
+    session = SessionUsers()
+    try:
+        user = session.query(User).filter(User.verify_token == token).first()
+        if not user:
+            return jsonify({"error": "Token invalide"}), 400
+        if user.verify_expiry and datetime.datetime.utcnow() > user.verify_expiry:
+            return jsonify({"error": "Token expiré"}), 400
+
+        user.is_verified  = True
+        user.verify_token = ""
+        session.commit()
+
+        try:
+            send_welcome_email(user.email)
+        except Exception:
+            pass
+
+        from flask import redirect
+        return redirect("/?confirmed=1")
     finally:
         session.close()
 
