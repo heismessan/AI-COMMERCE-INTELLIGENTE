@@ -438,6 +438,28 @@ def trends_stats():
 # MAIN
 # ─────────────────────────────────────────
 
+# ─────────────────────────────────────────
+# ADMIN — déclencher le scraping manuellement
+# ─────────────────────────────────────────
+
+@app.route("/admin/scrape")
+def admin_scrape():
+    secret = request.args.get("secret", "")
+    if secret != os.environ.get("ADMIN_SECRET", ""):
+        return jsonify({"error": "Non autorisé"}), 403
+
+    import threading
+    def run():
+        try:
+            run_scraper()
+            recalculate_all_scores()
+        except Exception as e:
+            print(f"❌ Scraper error: {e}")
+
+    threading.Thread(target=run, daemon=True).start()
+    return jsonify({"success": True, "message": "Scraping lancé en arrière-plan"})
+
+
 if __name__ == "__main__":
 
     port = int(os.environ.get("PORT", 5000))

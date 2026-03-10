@@ -1,2 +1,5 @@
 #!/bin/bash
-echo "Build complete"
+echo "Installing Playwright browsers..."
+playwright install chromium
+playwright install-deps chromium
+echo "Playwright ready."

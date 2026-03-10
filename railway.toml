@@ -1,5 +1,6 @@
 [build]
 builder = "nixpacks"
+buildCommand = "pip install -r requirements.txt && bash postinstall.sh"
 
 [deploy]
 startCommand = "gunicorn api:app --bind 0.0.0.0:$PORT --workers 1 --timeout 120"
