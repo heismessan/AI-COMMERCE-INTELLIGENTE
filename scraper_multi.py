@@ -25,7 +25,7 @@ import re
 from datetime import datetime, timezone
 from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
-from database import Session, Product
+from database import SessionLocal, Product
 from scoring_ai import score_with_local_ai
 
 
@@ -416,12 +416,12 @@ def main():
     print("  Plateformes : Amazon · eBay · Walmart · Etsy")
     print("═" * 55)
 
-    session = Session()
+    session = SessionLocal()
     total   = 0
 
     try:
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=False)
+            browser = p.chromium.launch(headless=True)
             context = browser.new_context(
                 viewport    = {"width": 1280, "height": 800},
                 locale      = "en-US",
